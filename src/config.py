@@ -1,9 +1,9 @@
 # =============================================================
-# src/config.py
+# src/config.py (VERSÃO FINAL - 3 FEATURES)
 # =============================================================
 from pathlib import Path
 
-# Define o caminho raiz do projeto (a pasta 'IDS-TCC')
+# Define o caminho raiz do projeto
 ROOT = Path(__file__).resolve().parents[1]
 
 # Define os caminhos para as subpastas principais
@@ -30,5 +30,5 @@ CONF_MATRIX_PNG = REPORTS / 'conf_matrix.png'
 # Define as classes de ataque que o projeto focará
 TARGET_CLASSES = ['BENIGN', 'PORTSCAN', 'DDOS', 'SSH-BF', 'OUTROS']
 
-# Define as features (características) que o modelo usará para aprender e prever
+# --- FEATURES FINAIS (Apenas as 3 comportamentais) ---
 FEATURES = ['duration_s', 'tot_pkts', 'pkts_per_sec']
