@@ -1,6 +1,3 @@
-# =============================================================
-# src/offline_predict_pcap.py (VERSÃO FINAL)
-# =============================================================
 import argparse
 import json
 import joblib
@@ -35,7 +32,6 @@ def predict_pcap(pcap_path: str):
         print("Nenhum fluxo extraído.")
         return
 
-    # Preenche colunas
     for f in FEATURES:
         if f not in df_flows.columns:
             df_flows[f] = 0

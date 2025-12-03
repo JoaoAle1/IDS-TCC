@@ -1,6 +1,3 @@
-# =============================================================
-# src/live_capture.py (VERSÃO FINAL - COM FILTRO DE DURAÇÃO)
-# =============================================================
 import argparse
 import json
 import joblib
@@ -53,13 +50,10 @@ def live_capture(interface: str, seconds: int):
         print("Nenhum fluxo capturado.")
         return
 
-    # --- FILTRO DE RUÍDO (Broadcast/Multicast) ---
+
     filtro_broadcast = df_flows['flow_key'].str.contains(r'\.255:|224\.|239\.|ff02', regex=True)
     df_flows = df_flows[~filtro_broadcast]
 
-    # --- OPÇÃO 1: FILTRO DE DURAÇÃO (O segredo para limpar os falsos positivos) ---
-    # Ignora fluxos "lentos" (> 1.0s) que geralmente são tráfego normal (downloads, vídeos).
-    # Ataques como PortScan e DDoS (do tipo que o modelo aprendeu) são explosivos (< 1s).
     df_flows = df_flows[df_flows['duration_s'] < 1.0]
 
     if df_flows.empty:
@@ -70,14 +64,14 @@ def live_capture(interface: str, seconds: int):
     print("\n--- DADOS SUSPEITOS PARA ANÁLISE ---")
     print(df_flows.head(5))
 
-    # Preenche colunas se faltar alguma
+
     for f in FEATURES:
         if f not in df_flows.columns:
             df_flows[f] = 0
 
     X_flows = df_flows[FEATURES].copy()
 
-    # Logaritmo apenas em pkts_per_sec
+
     X_flows.loc[:, 'pkts_per_sec'] = np.log1p(X_flows['pkts_per_sec'].values)
 
     X_flows.replace([np.inf, -np.inf], np.nan, inplace=True)
@@ -96,7 +90,7 @@ def live_capture(interface: str, seconds: int):
         with open(ALERTS_LOG, 'a', encoding='utf-8') as f:
             for _, alert in alerts.iterrows():
                 log_entry = alert.to_dict()
-                # Timestamps reais
+
                 log_entry['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 f.write(json.dumps(log_entry) + "\n")
         print(f"Alertas salvos em: {ALERTS_LOG}")

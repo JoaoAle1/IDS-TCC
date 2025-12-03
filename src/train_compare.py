@@ -1,6 +1,3 @@
-# =============================================================
-# src/train_compare.py (VERSÃO WEIGHTED AVG + 3 FEATURES)
-# =============================================================
 import json
 import joblib
 import pandas as pd
@@ -20,11 +17,9 @@ df = pd.read_csv(FLOWS_LABELED)
 X = df[FEATURES]
 y = df['label']
 
-# --- TRANSFORMAÇÃO LOGARÍTMICA (Apenas pkts_per_sec) ---
 if 'pkts_per_sec' in X.columns:
     X.loc[:, 'pkts_per_sec'] = np.log1p(X['pkts_per_sec'].values)
 
-# Limpeza final
 X.replace([np.inf, -np.inf], np.nan, inplace=True)
 X.fillna(0, inplace=True)
 
@@ -34,12 +29,10 @@ print(f"Dataset carregado: {len(df)} amostras.")
 le = LabelEncoder()
 y_enc = le.fit_transform(y)
 
-# Divisão 70/30 Estratificada
 X_train, X_test, y_train, y_test = train_test_split(
     X, y_enc, test_size=0.3, stratify=y_enc, random_state=42
 )
 
-# Escalonamento
 scaler = StandardScaler()
 X_train_s = scaler.fit_transform(X_train)
 X_test_s = scaler.transform(X_test)
@@ -61,11 +54,10 @@ for name, clf in candidates.items():
     clf.fit(X_train_s, y_train)
     y_pred = clf.predict(X_test_s)
 
-    # Relatório com zero_division=0 para evitar warnings
     report_dict = classification_report(y_test, y_pred, target_names=le.classes_, output_dict=True, zero_division=0)
     report_text = classification_report(y_test, y_pred, target_names=le.classes_, zero_division=0)
 
-    # --- USANDO WEIGHTED AVG ---
+
     f1_weighted = report_dict['weighted avg']['f1-score']
     metrics_all[name] = report_dict
 

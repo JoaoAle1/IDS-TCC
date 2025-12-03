@@ -1,6 +1,3 @@
-# =============================================================
-# src/feature_extractor.py (VERSÃO FINAL - 3 FEATURES)
-# =============================================================
 import pandas as pd
 from config import FEATURES
 

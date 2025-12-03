@@ -1,6 +1,4 @@
-# =============================================================
-# src/app_streamlit.py (VERSÃO FINAL - AJUSTADA)
-# =============================================================
+
 import streamlit as st
 import pandas as pd
 import json
@@ -10,12 +8,12 @@ from config import ALERTS_LOG, METRICS_JSON, CONF_MATRIX_PNG
 import subprocess
 import sys
 
-# --- Configurações da Página e Título ---
+
 st.set_page_config(page_title="IDS Dashboard", layout="wide", initial_sidebar_state="auto")
 st.title("🛡️ Dashboard de Detecção de Intrusão (IDS)")
 st.markdown("Use este painel para monitorar o desempenho do modelo e analisar os alertas de segurança de rede.")
 
-# Dicionário com descrições dos ataques para consulta
+
 ATTACK_DESCRIPTIONS = {
     "PORTSCAN": "O ataque Port Scan consiste em varrer as portas de um computador para identificar serviços ativos e vulneráveis.",
     "DDOS": "O ataque de Negação de Serviço Distribuída (DDoS) visa sobrecarregar um servidor ou rede com tráfego massivo, tornando-o indisponível.",
@@ -24,7 +22,7 @@ ATTACK_DESCRIPTIONS = {
 }
 
 
-# --- Funções de Carregamento de Dados ---
+
 
 @st.cache_data(ttl=60)
 def load_metrics_data():
@@ -41,7 +39,7 @@ def load_alerts_data():
         lines = [json.loads(x) for x in log_path.read_text(encoding='utf-8').splitlines() if x.strip()]
         if lines:
             df = pd.DataFrame(lines)
-            # Usa timestamp do arquivo se não existir
+
             if 'timestamp' not in df.columns:
                 df['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -53,9 +51,9 @@ def load_alerts_data():
 metrics_data = load_metrics_data()
 alerts_df = load_alerts_data()
 
-# =============================================================
-# --- BARRA LATERAL (SIDEBAR) ---
-# =============================================================
+
+
+
 st.sidebar.header("Filtros de Alertas")
 if not alerts_df.empty:
     unique_attack_types = alerts_df['predicted_label'].unique()
@@ -70,7 +68,7 @@ else:
     selected_types = []
     ip_filter = ""
 
-# --- Bloco do Botão de Captura ---
+
 st.sidebar.header("Controles de Captura")
 INTERFACE_DE_CAPTURA = "Ethernet"
 
@@ -91,16 +89,12 @@ if st.sidebar.button(f"Iniciar Captura de 60s na Interface '{INTERFACE_DE_CAPTUR
 
     with st.spinner(f"Capturando tráfego em '{INTERFACE_DE_CAPTURA}'... O dashboard ficará ocupado por 60 segundos."):
         try:
-            # Executa o comando silenciosamente
+
             result = subprocess.run(command, capture_output=True, text=True, check=True, encoding='utf-8',
                                     errors='ignore')
 
-            # --- MUDANÇA AQUI: Removemos o 'st.sidebar.code(result.stdout)' ---
-            # Se quiser ver o log para debug, descomente a linha abaixo:
-            # st.sidebar.expander("Ver Log Técnico").code(result.stdout)
-
             if result.stderr:
-                # Mostra erros apenas se houver
+
                 st.sidebar.error("Aviso/Erro durante captura:")
                 st.sidebar.code(result.stderr)
 
@@ -115,19 +109,18 @@ if st.sidebar.button(f"Iniciar Captura de 60s na Interface '{INTERFACE_DE_CAPTUR
         except Exception as e:
             st.sidebar.error(f"Erro inesperado: {e}")
 
-# =============================================================
-# --- Definição das Abas ---
-# =============================================================
+
+
+
 tab_overview, tab_alerts, tab_performance = st.tabs([
     "Visão Geral 📈",
     "Análise de Alertas 🚨",
     "Desempenho do Modelo 🧠"
 ])
 
-# Colunas para mostrar (apenas as relevantes)
 COLUNAS_PARA_MOSTRAR = ['flow_key', 'duration_s', 'tot_pkts', 'pkts_per_sec', 'predicted_label', 'timestamp']
 
-# --- Aba 1: Visão Geral ---
+
 with tab_overview:
     st.header("Resumo da Atividade de Rede")
 
@@ -152,12 +145,12 @@ with tab_overview:
     else:
         st.info("Nenhum alerta detectado ainda.")
 
-# --- Aba 2: Análise de Alertas ---
+
 with tab_alerts:
     st.header("Explorador de Alertas Detalhados")
 
     if not alerts_df.empty:
-        # Aplicação dos Filtros
+
         filtered_df = alerts_df[alerts_df['predicted_label'].isin(selected_types)]
 
         if ip_filter:
@@ -168,7 +161,6 @@ with tab_alerts:
         cols_display_aba2 = [col for col in COLUNAS_PARA_MOSTRAR if col in filtered_df.columns]
         st.dataframe(filtered_df[cols_display_aba2], use_container_width=True)
 
-        # --- RESTAURADO: Descrições dos Ataques ---
         st.subheader("O que estes ataques significam?")
         for attack_type in selected_types:
             if attack_type in ATTACK_DESCRIPTIONS:
@@ -177,7 +169,7 @@ with tab_alerts:
     else:
         st.info("Nenhum alerta para analisar.")
 
-# --- Aba 3: Desempenho do Modelo ---
+
 with tab_performance:
     st.header("Métricas e Performance do Modelo de Machine Learning")
 

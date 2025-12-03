@@ -1,1 +1,2 @@
-{"flow_key": "192.168.1.10:54225-108.158.137.111:443|TCP", "duration_s": 0.024814844131469727, "tot_pkts": 7, "pkts_per_sec": 282.08921897368396, "predicted_label": "DDOS", "timestamp": "2025-11-20 19:15:33"}
+{"flow_key": "192.168.1.11:47386-192.168.1.8:36866|TCP", "duration_s": 0.13885498046875, "tot_pkts": 10, "pkts_per_sec": 72.01758241758242, "predicted_label": "DDOS", "timestamp": "2025-11-30 20:11:37"}
+{"flow_key": "192.168.1.11:47411-191.237.206.80:443|TCP", "duration_s": 0.0326690673828125, "tot_pkts": 7, "pkts_per_sec": 214.26996730499766, "predicted_label": "DDOS", "timestamp": "2025-11-30 20:19:38"}

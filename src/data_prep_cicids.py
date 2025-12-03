@@ -1,6 +1,4 @@
-# =============================================================
-# src/data_prep_cicids.py (VERSÃO FINAL - 3 FEATURES)
-# =============================================================
+
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -9,7 +7,7 @@ from config import CICIDS_CSV, FLOWS_LABELED, PROCESSED, FEATURES
 
 warnings.filterwarnings('ignore')
 
-# Mapeamento de colunas (apenas as necessárias para calcular as 3 features)
+
 CANDIDATES = {
     'flow_duration': ['Flow Duration', 'Flow_Duration', 'FlowDuration'],
     'fwd_pkts': ['Tot Fwd Pkts', 'Total Fwd Packets'],
@@ -93,18 +91,17 @@ def main():
 
     tmp.fillna(0, inplace=True)
 
-    # Cálculo das 3 features
+
     tmp['duration_s'] = tmp['flow_duration'] / 1e6
     tmp['tot_pkts'] = tmp['fwd_pkts'] + tmp['bwd_pkts']
 
-    # Evita divisão por zero
+
     duration_safe = tmp['duration_s'].replace(0, 1e-6)
     tmp['pkts_per_sec'] = tmp['tot_pkts'] / duration_safe
 
-    # Normaliza os rótulos
     tmp['label'] = tmp['label'].map(LABEL_MAP).fillna('OUTROS')
 
-    # Seleciona as colunas finais
+
     out = tmp[FEATURES + ['label']].copy()
 
     out.replace([np.inf, -np.inf], np.nan, inplace=True)
